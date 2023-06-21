@@ -1,8 +1,8 @@
 from helpers.jwtFile import create_token
+import bcrypt
 
 
 def registerFunction(username, email, password, connection):
-    print(1111)
     cursor = connection.cursor()
     checkIfEmailIsTaken = "SELECT * FROM users WHERE email = %s"
     cursor.execute(checkIfEmailIsTaken, (email,))
@@ -11,8 +11,10 @@ def registerFunction(username, email, password, connection):
     if result:
         return {"error": "User already registered with this email."}
 
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
     query = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
-    cursor.execute(query, (username, email, password))
+    cursor.execute(query, (username, email, hashed_password))
     connection.commit()
     last_insert_id = cursor.lastrowid
     token = create_token(last_insert_id, username, email)
@@ -30,7 +32,7 @@ def loginFunction(email, cursor, password):
     savedUsername = rows[0][1]
     savedEmail = rows[0][2]
     savedPassword = rows[0][3]
-    if savedEmail == email and savedPassword == password:
+    if savedEmail == email and bcrypt.checkpw(password.encode('utf-8'), savedPassword.encode('utf-8')):
         token = create_token(id, savedUsername, savedEmail)
         return token
     else:
