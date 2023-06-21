@@ -19,9 +19,9 @@ def addTodo(connection, title, description, status, date, userId, label):
     return {"message": "Todo added successfully"}
 
 
-def getTodos(connection, userId,status):
+def getTodos(connection, userId):
     cursor = connection.cursor()
-    query = f"SELECT * FROM todos WHERE userId = {userId} AND status = '{status}'"
+    query = f"SELECT * FROM todos WHERE userId = {userId}"
     cursor.execute(query)
     column_names = [column[0] for column in cursor.description]
     rows = cursor.fetchall()

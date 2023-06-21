@@ -63,8 +63,7 @@ def getTodosByUserIdDef():
     try:
         auth_header = request.headers['Authorization']
         user_id = decode_token(auth_header)
-        status = request.args.get('status')
-        res = getTodos(connection, user_id, status)
+        res = getTodos(connection, user_id)
         getLabels = getLabelsForUser(connection, user_id)
         return jsonify({"todos": res, "labels": getLabels})
     except Exception as e:
